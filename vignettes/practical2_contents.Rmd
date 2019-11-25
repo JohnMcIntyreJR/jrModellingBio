@@ -1,0 +1,274 @@
+## Question 1 - Simple Linear Regression
+
+Load the relevant packages.
+
+```{r, echo = TRUE}
+library("jrModellingBio")
+library("broom")
+library("tidyverse")
+```
+
+\newthought{Lets return} to the yeast data to practice some more advanced analyses.
+
+The data can be obtained from:
+
+```{r, echo = TRUE}  
+data(yeast, package = "jrModellingBio")
+```
+
+1. Lets fit a liner regression model as follows: Use $mcg$ as the y or response variable and use $gvh$ as the x or explanatory variable. Should $gvh$ be included in the model to explain variatio in $mcg$?
+    
+```{r, }
+m = lm(mcg ~ gvh, data = yeast)
+tidy_m = tidy(m)
+tidy_m
+##The p-value for the gradient is 0.01
+##This suggests gvh is useful in explaining variation in 
+```
+
+2. Plot the data with `gvh` on the x-axis and `mcg` on the y-axis. You can use **ggplot2** or base, but as in the notes we'll be using **ggplot2** for the solutions. Add a dashed red line indicating the line of best fit.
+
+```{r,F1, fig.keep='none', message = FALSE, warning = FALSE}
+library("ggplot2")
+ggplot(yeast, aes(x = gvh, y = mcg)) +
+    geom_point() +
+    geom_abline(intercept = tidy_m$estimate[1],
+                    slope = tidy_m$estimate[2],
+                linetype = 2, colour = "red")
+```
+
+```{r,fig.margin = TRUE, fig.cap="Scatterplot with the earnings data. Also shows the line of best fit.", out.width='\\textwidth', echo=FALSE}
+ggplot(yeast, aes(x = gvh, y = mcg)) +
+    geom_point() +
+    geom_abline(intercept = tidy_m$estimate[1],
+                    slope = tidy_m$estimate[2],
+                linetype = 2, colour = "red") +
+    theme_bw()
+```
+
+3. Plot the standardised residuals against the fitted values. Does the graph
+look random? Hint: Use `augment()`
+
+```{r,F2, fig.keep='none', message = FALSE, warning = FALSE}
+##Model diagnosics look good
+m_aug = augment(m)
+ggplot(m_aug, aes(x = .fitted, y = .std.resid)) +
+    geom_point() +
+    geom_hline(
+        yintercept = c(0, -2, 2),
+        linetype = c(2, 3, 3),
+        colour = c("red", "green", "green")
+    )
+```
+
+4. Construct a q-q plot of the standardised residuals.
+
+```{r,fig.keep='none', }
+ggplot(m_aug, aes(sample = .std.resid)) +
+    geom_qq() +
+    geom_qq_line(colour = "steelblue",
+                linetype = 2) 
+##Model diagnosics look good
+```
+
+5. What is wrong with this model? Discuss (in less than 20 words).
+
+```{r, }
+# When we fit a regression model we are implicitly assuming a causal relationship.
+# In this case we are talking about two measurements of signal peptides, one is unlikely to be caused by the other but they are correlated because some (as yet) unseen variable is causally related to both.
+```
+
+
+
+## Question 2 - Multiple Linear Regression
+
+\newthought{Lets now} a more sensible model with some different data. We will look at the occurrence of infectious disease illnesses across the USA caused by different organisms. Load the `outbreaks` dataset:
+
+```{r, echo=TRUE}
+data(outbreaks, package = "jrModellingBio")
+```
+
+and examine its contents with your favourite functions for this job. Note you can find out a little more about this data by reading its help file `?outbreaks`.
+
+
+
+
+
+
+
+1. Fit the multivariate regression model predicting `class` from `mcg` and `gvh`. In this case because `class` is a categorical variable we can use anova to fit such a model, recall the `aov()` function to fit an anova model.
+
+```{r,fig.keep='none'}
+fit = aov(class ~ mcg + gvh, data = yeast)
+```
+
+2. Examine the Standardised residual plots. Is there anything that would
+suggest you have a problem with your model? What do you do?
+    ```{r,fig.keep='none'}
+    fit_aug = augment(fit)
+    ggplot(fit_aug, aes(x = OI,
+                        y = .std.resid)) +
+        geom_point() +
+        geom_hline(yintercept = c(0, -2, 2),
+                   linetype = c(2, 3, 3),
+                   colour = c("red", "green", "green"))
+
+    ggplot(fit_aug, aes(x = age, 
+                        y = .std.resid)) +
+        geom_point() +
+        geom_hline(yintercept = c(0, -2, 2),
+                   linetype = c(2, 3, 3),
+                   colour = c("red", "green", "green"))
+    
+    ggplot(fit_aug, aes(x = .fitted, y = .std.resid)) +
+        geom_point() + 
+        geom_hline(yintercept = c(0,-2, 2), 
+                     linetype = c(2,3,3), 
+                     colour = c("red", "green", "green"))
+    
+    ggplot(fit_aug, aes(sample = .std.resid)) +
+        geom_qq() +
+        geom_abline(colour = "steelblue",
+                    linetype = 2)
+    
+    # The q-q plot shows the residuals lying close to the fitted straight 
+    # line which suggests that the normality assumption is satisfied.
+    # The residuals in the first plot appear to show a pattern. 
+    # Consider transforming the response variable or the explanatory variables
+    # or adding a square term / interaction term to your model.
+    ```
+
+## Question 3 - Multiple Linear Regression
+
+\newthought{Dr Phil} comes to see you with his data. He believes that IQ can be
+predicted by the number of years education. Dr Phil does not differentiate
+between primary, secondary and tertiary education. He has four variables:
+
+- `IQ` - the estimated IQ of the person (the response variable);
+- `AgeBegin` - the age of the person when they commenced education;
+- `AgeEnd` - the age of the person when they finished education;
+- `TotalYears` - the total number of years a person spent in education.
+
+The data can be obtained from:
+```{r, echo = TRUE}
+data(drphil, package = "jrModelling")
+```
+
+Read the data into R and fit the linear regression model:
+\[
+IQ = \beta_0 + \beta_1 AgeBegin + \beta_2 AgeEnd + \beta_3 TotalYears + \epsilon
+\]
+Explain what is wrong with this model? Suggest a possible remedy. 
+```{r}
+(m = lm(IQ ~ AgeBegin + AgeEnd + TotalYears, data = drphil))
+#The problem is TotalYears = AgeEnd - AgeBegin
+#Solution: remove TotalYears
+```
+
+
+## Question 4 = One way ANOVA tables
+
+\newthought{A pilot study} was developed to investigate whether music
+influenced exam scores. Three groups of students listened to 10 minutes of
+Mozart, silence or heavy metal before an IQ test. The results of the IQ test
+can be obtained from:
+```{r, echo = TRUE}
+data(iq, package = "jrModelling")
+```
+
+1. Construct a one-way ANOVA table. Are there differences between treatment groups?
+    ```{r}
+    m = aov(score ~ music, data = iq)
+    tidy_m = tidy(m)
+    tidy_m    
+    ## The p value is around 0.056.
+    ## This suggests a difference may exist.
+    ```
+
+2. Check the standardised residuals of your model using `augment()` and **ggplot2**
+    ```{r,F3, fig.keep='none',  }
+    m_aug = augment(m)
+    ggplot(m_aug, aes(x = .fitted, y = .std.resid)) +
+        geom_point() + 
+        geom_hline(yintercept = c(0,-2, 2), 
+                     linetype = c(2,3,3), 
+                     colour = c("red", "green", "green"))
+    ## Residual plot looks OK
+    ```
+
+    ```{r,fig.margin = TRUE, out.width='\\textwidth', echo=FALSE, fig.cap = "Model diagnosics for the music data.", message = FALSE, warning = FALSE}
+    ggplot(m_aug, aes(x = .fitted, y = .std.resid)) +
+        geom_point() + 
+        geom_hline(yintercept = c(0,-2, 2), 
+                     linetype = c(2,3,3), 
+                     colour = c("red", "green", "green")) +
+        ylim(-2.5, 2.5) +
+        theme_bw() +
+        labs(x = "Fitted values",
+             y = "Standardised Residuals")
+    ```
+
+3. Perform a multiple comparison test to determine where the difference lies.
+```{r,  }
+TukeyHSD(m)
+
+# The p values indicate that there the main differences can be found between the Mozart - Heavy Metal & Silence - Heavy Metal comparisons. Looking at the boxplot we can see that the iq scores for participants listening to Heavy Metal were lower than those listening to Mozart or silence. However, there was not much difference in performance between those listening to Mozart compared to those listening to silence.
+
+ggplot(iq, aes(x = music, y = score)) +
+    geom_boxplot()
+```
+
+
+\newthought{The following sections} use the results of the Olympic heptathlon
+competition, Seoul, 1988. To enter the data into R, use the following commands
+```{r, echo = TRUE}
+data(hep, package = "jrModelling")
+##Remove the athletes names and final scores.
+hep_names = hep[, 1]
+hep = hep[, 2:8]
+```
+
+## Question 5 - Hierarchical clustering
+
+\newthought{Using the heptathlon} data set, carry out a clustering analysis. Try
+different distance methods and clustering functions.
+
+Try using `plot()` to create a cluster dendogram, and use `hep_names` in the label argument. 
+
+```{r, fig.keep="none"}
+plot(hclust(dist(hep)), labels = hep_names)
+```
+
+## Question 6 - Principal components analysis
+
+1. Calculate the correlation matrix of the `hep` data set.
+    ```{r, }
+    ##Round to 2dp
+    signif(cor(hep), 2)
+    ```
+
+2. Carry out a PCA on this data set.
+    ```{r}
+    ##Run principle components
+    prcomp(hep)
+    ```
+
+3. Do you think you need to scale the data?
+    ```{r, }
+    ##Yes!. run800m dominates the loading since
+    ##the scales differ
+    prcomp(hep, scale = TRUE)
+    ```
+
+4. Construct a biplot of the data.
+    ```{r,  fig.keep="none"}
+    biplot(prcomp(hep, scale = TRUE))
+    ```
+
+## Solutions
+
+Solutions are contained within this package:
+```{r, echo = TRUE, eval = FALSE}
+vignette("solutions2", package = "jrModelling")
+```
+

@@ -1,0 +1,142 @@
+
+Load the relevant packages.
+```{r, echo = TRUE, message= FALSE, warning = FALSE}
+library("jrModellingBio")
+library("broom")
+library("tidyverse")
+```
+
+\noindent I've starred, $^*$, some of the questions. This indicates that we didn't directly cover the material in the lecture. If you are particular interested in this statistical area, try the question. Otherwise, just move on.
+
+## Question 1
+
+The following code will load a data set into your current session which contains a data frame of of measurements of sequence recognition from yeast proteins with different subcellular localisations[^1].
+
+[^1]: Paul Horton & Kenta Nakai, ["A Probablistic Classification System for Predicting the Cellular Localization Sites of Proteins"](https://www.aaai.org/Papers/ISMB/1996/ISMB96-012.pdf), Intelligent Systems in Molecular Biology, 109-115. St. Louis, USA 1996. 
+
+```{r}
+data(two_classes, package = "jrModellingBio")
+```
+
+The vector loaded into the session is called `two_classes` since the dataset is in a package we can get the documentation for that data with `?two_classes`.
+
+Use the `head()` or `View()` or other functions of your choice to examine the contents of the data.
+
+a) Sometimes, it's useful to get data into a tidy format before we start analysis. We can then use the `pivot_longer()` function from **tidyr** to get the data into the correct shape for analysis. The `pivot_longer()` function gathers up the two subcellular localisations columns into one new variable. If you haven't used the `pivot_longer()` function before, have a look at the help file `?pivot_longer()`. 
+
+    ```{r, echo = TRUE}
+two_classes_long = pivot_longer(two_classes, cols = c(CYT, EXC), names_to = "class", values_to = "mcg")
+    ```
+
+b) Exploratory data analysis. - Construct boxplots, density plots and q-q plots for this data set. Work out the means and standard deviations. Before carrying out any statistical test, what do you think your conclusions will be? Do you think the variances are roughly equal? Do you think the data conforms to a normal distribution?
+
+```{r, fig.keep = 'none'}
+# Box plot
+ggplot(two_classes_long, aes(x = class, y = mcg)) +
+  geom_boxplot()
+
+# Density plot
+ggplot(two_classes_long, aes(x = mcg, fill = class)) + 
+  geom_density(alpha = 0.4)
+
+# QQ plots
+ggplot(two_classes_long, aes(sample = mcg)) + 
+  geom_qq() + 
+  geom_qq_line()
+
+# Means and standard deviations
+two_classes_long %>%
+  group_by(class) %>%
+  summarise(mean = round(mean(mcg), 2),
+            sd = round(sd(mcg), 2))
+```
+
+
+c) Carry out a two sample $t$-test. Assume that the variances are unequal.
+
+```{r,  }
+t.test(mcg ~ class, data = two_classes_long, var.equal = FALSE)
+```
+
+How does this answer compare with your intuition?
+
+d) Carry out a two sample $t$-test, assuming equal variances.
+
+```{r,  }
+t.test(mcg ~ class, data = two_classes_long, var.equal = TRUE)
+```
+
+e) $^*$ Now carry out a `wilcox.test()`.
+
+```{r, }
+wilcox.test(mcg ~ class, data = two_classes_long)
+```
+
+## Question 2
+
+\newthought{Suppose we} are interested whether or not yeast proteins are evenly spread across the subcellular locations. We can examine the counts of proteins across each of the subcellular localisation classes.
+
+Load the data into R using the following code:
+
+```{r, echo = TRUE}
+data(yeast_classes, package = "jrModellingBio")
+```
+
+a) Carry out a $\chi^2$ goodness of fit test on the zodiac data. Are yeast proteins distributed uniformly across subcellular localisations?
+
+```{r,  }
+m = chisq.test(yeast_classes)
+## Since p < 0.05 we can reject the null hypothesis.
+## We have strong evidence that yeast proteins are distributed uniformly across subcellular localisations. 
+```
+
+
+b) What are the expected values for each subcellular localisation? Hint: Use `augment()`
+
+```{r, message = FALSE, warning = FALSE }
+library("broom")
+m_aug = augment(m)
+m_aug$.expected
+```
+
+c) Use `augment()` to look at the standardised residuals. Which are large?
+
+```{r,  }
+m_aug$.stdres
+```
+
+## Question 3
+
+\newthought{We} might reasonably expect McGeoch’s signal sequence detection parameter `mcg` and the a method for detecting cleavable signal sequences `gvh` to be correlated so lets test whether or not these two measurements are associated with one another. We will do this by calculating pearsons correlation coefficient but first lets load the full yeast data set:
+
+```{r, echo = TRUE}
+data(yeast, package = "jrModellingBio")
+```
+
+a) Perform the $\r^2$ correlation test to determine if the two measurements of signal sequences `mcg` and `gvh` are correlated.
+
+```{r, warning=FALSE, }
+test = cor.test(~ mcg + gvh, data = yeast)
+test
+```
+
+b) Now use the `glance()` function to extract summary statistics from the test then store the correlation coefficient under a new variable e.g. `r2`. Round this estimate to 3 significant figures using the `signif()` function.
+
+```{r,  }
+r2 = signif(glance(test)$estimate, 3)
+```
+
+c) Now plot the data as a scatter plot using `ggplot2` and annotate the plot with the `annotate()` function adding the correlation coefficient onto the figure. __Hint: you can create a nice label with the `paste()` function to stick bits of text together including variables you have created.__
+
+```{r,  }
+ggplot(yeast, aes(x = mcg, y = gvh)) +
+  geom_point() +
+  annotate("label", x = 0.1, y = 0.9, label = paste("r2 = ", r2), hjust = 0)
+```
+
+## Solutions
+
+Solutions are contained within this package:
+```{r, echo = TRUE, eval = FALSE}
+vignette("solutions1", package = "jrModellingBio")
+```

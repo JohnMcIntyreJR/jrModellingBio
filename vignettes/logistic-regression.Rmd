@@ -1,0 +1,168 @@
+---
+title: "Logistic Regression"
+author: "Jumping Rivers"
+output:
+  tufte::tufte_handout:
+    latex_engine: xelatex
+  tufte::tufte_html: default
+vignette: >
+  %\VignetteIndexEntry{logisticregression}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Logistic Regression
+
+## Introduction
+
+In linear regression we had problems where we made the assumption that the response variable $Y$ was quantitative. In many situations however, the response variable is instead qualitative. \marginnote{Often qualitative variables are referred to as categorical.} 
+
+Consider the `titanic_train` data set in the **titanic** package. Unsurprisingly, this data sets contains information about who survived the sinking of the Titanic. The aim is to predict the chance of a passenger
+surviving the disaster. 
+
+
+```{r, message = FALSE}
+library("titanic")
+library("dplyr")
+titanic_train %>%
+  select(Age, Sex, Survived) %>%
+  head(3)
+```
+
+
+```{r, label = "default-lm", fig.margin = TRUE, echo = FALSE, fig.cap = "Estimated probabilities of default using simple linear regression. Some probabilities are negative!", fig.height = 4}
+x = titanic_train$Fare
+plot(x, titanic_train$Survived,
+     ylab = "Default probability", xlab = "Passenger Fare",
+     pch = 21, bg = 1, panel.first = grid(), cex = 0.8)
+abline(lm(Survived ~ Fare, data = titanic_train), col = 2, lwd = 2)
+```
+
+\noindent The response is the binary variable `Survived`. Rather than modelling the response directly, logistic regression models the probability that $Y$ belongs to a certain category. For convenience we will use the standard and generic $0/1$ encoding for the response. 
+
+```{r, label = "log1", fig.margin = TRUE, echo = FALSE, fig.cap = "Estimated probabilities of default using a logistic regression model.", fig.height = 4}
+m = glm(Survived ~ Fare, family = binomial, data = titanic_train)
+plot(x, titanic_train$Survived,
+     ylab = "Default probability", xlab = "Passenger Fare",
+     pch = 21, bg = 1, panel.first = grid(), cex = 0.8)
+p = predict(m, data.frame(Fare = 0:500), type = "response")
+lines(0:500, p, col = 2)
+```
+
+\noindent The response variable is numeric, so we could use simple linear regression to predict survival based on the passenger fare, but as we'll see, this isn't a great idea.
+
+The issue with figure \@ref(fig:default-lm) is that probability should be between $0$ and $1$, but simple linear regression isn't bounded. Furthermore, 
+
+* The deviations from the line are clearly not normal
+* The variance isn't constant.
+
+To avoid this, we model the response using a function that gives output between $0$ and $1$ for all values of $X$. In logistic regression we use the \emph{logistic function}, see figure \@ref(fig:log2).
+
+
+\begin{equation}\label{3.4}
+  \pi(X) = \frac{e^{\beta_{0} + \beta_{1}X}} {1 + e^{\beta_{0} +
+      \beta_{1}X}}\, ,
+\end{equation}
+where $\pi(X)$ is the probability $Pr(Y = 1\,\vert\,X)$.
+
+After some manipulation we can find that 
+\begin{equation}
+  \log \left( \frac{\pi(X)} {1 - \pi(X)} \right) = \beta_{0} +
+  \beta_{1}X.
+  \label{eq:logit}
+\end{equation}
+
+This expression is also known as a \emph{link function} that links the linear model $\beta_{0} + \beta_{1}X$ with the response. \marginnote{This particular link function $\log \left( \frac{X} {1 - X} \right)$ is called the   \emph{logit} link. Another common link function is \emph{probit}.}
+
+```{r, label = "log2", fig.margin = TRUE, echo = FALSE, fig.cap = "The logistic function."}
+x = seq(-6, 6, 0.01)
+logisticfunc = function(x) {
+  exp(x) / (1 + exp(x)) 
+  }
+plot(x, logisticfunc(x), type = "l", xlab = "x", main = "Logistic function", 
+     panel.first = grid(), col = 4, ylab = expression(pi(x)))
+#, with $\beta_0=0$ and $\beta_1=1$.}
+```
+
+The left hand side of equation~\ref{eq:logit} is called the \emph{log-odds} and the right hand side should now be familiar to us. The logistic regression has a logit that is linear in $X$. Using the linear regression model from the earlier chapter we could interpret $\beta_{1}$ as being the average change in $Y$ for a unit change in $X$. With logistic regression increasing $X$ by one unit changes the log-odds by $\beta_{1}$, or multiplies the odds by $e^{\beta_{1}}$. Since the relationship is not linear for
+$\pi(X)$ the amount that $\pi(X)$ changes will depend on the current value of $X$. 
+
+## Example: Titanic (Women & Children)
+
+To fit a logistic regression model in R, we use the base function `glm()`. As before, the function uses the standard formula interface. We'll predict survival based on the passengers' `age`\sidenote{For a number of passengers, the \texttt{age} is missing. The \texttt{glm} function just discards them.} and
+`gender`.
+
+```{r}
+library("titanic")
+m = glm(Survived ~ Sex + Age, 
+        family = binomial, 
+        data = titanic_train)
+```
+
+\noindent As before, we'll use the `tidy()` function to extract further
+details 
+
+```{r }
+library("broom")
+tidy(m)
+```
+
+\noindent The output above is similar to tidy output we have seen for linear regression.
+
+The logistic regression coefficients give the change in the log odds of the outcome for a one unit increase in the predictor variable. In this case, `Age` is not significant, but `Gender` is. The interpretation of the coefficients are
+
+* For a one unit increase in `Age`, the log odds of surviving is -0.005 \sidenote{So the older you are, the less likely you are to survive.}
+* Indicator variables, e.g. Male/Female or Yes/No, have a slightly different interpretation. Here being Male changes the log odds by -2.5 \sidenote{So model confirms the idea of ``Women and Children first''.}. However, this variable isn't significant.
+
+We can use `glance()` to find out more summary statistics about the model, such as the null deviance and residual deviance.
+```{r}
+(g = glance(m))
+```
+
+The null deviance shows how well the response is predicted by the model with nothing but an intercept, i.e. compared to the average survival probability. The residual deviance shows how well the response is predicted by the model when the additional predictors are included. The deviance has a $\chi^2$ distribution. 
+
+The Residual deviance (`deviance`) is 750 with 711 degrees of freedom (`df.residual`) . The associated $p$-value can be calculated in R via
+
+```{r}
+1 - pchisq(g$deviance, g$df.residual)
+```
+
+\noindent which is greater than $0.05$, we can conclude the model is reasonable.
+
+For the NULL model, the relevant columns are `null.deviance` and `df.null`. This gives a $p$-value of
+
+```{r}
+1 - pchisq(g$null.deviance, g$df.null)
+```
+
+\noindent and see that the fit is inadequate, so we cannot ascribe the response
+to simple variation not depending on any covariate. 
+
+We can obtain confidence intervals using the `confint` function (based on the profiled log-likelihood function).
+
+```{r, messgage= FALSE}
+confint(m)
+``` 
+
+\noindent Odds ratios \sidenote{See https://stats.stackexchange.com/q/133623/8  for details.} can also be easily extract via
+
+````{r}
+exp(coef(m))
+```
+
+\noindent Notice that the odds-ratio for `Age` is almost one. Indicting little change with `Age`. In this particular example, it might be worth classifying people as adults or children instead of using a linear covariate. 
+
+For many models in R, there is an associated `predict()` method. You simply pass in the model of interest, a data frame of variables:
+
+```{r}
+predict(m, 
+        data.frame(Age = 50, Sex = c("male", "female")), 
+        type = "response")
+```
+
+## Further Resources
+
+* Titanic analysis using logistic regression - [datascienceplus.com/perform-logistic-regression-in-r](datascienceplus.com/perform-logistic-regression-in-r)
+* Difference between logit and probit models -  [www.methodsconsultants.com/tutorial/what-is-the-difference-between-logit-and-probit-models](www.methodsconsultants.com/tutorial/what-is-the-difference-between-logit-and-probit-models)
+* R4DS modelling section [https://r4ds.had.co.nz/model-basics.html](https://r4ds.had.co.nz/model-basics.html)
+

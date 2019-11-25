@@ -1,0 +1,10 @@
+knitr_figure
+*.aux
+*.log
+*.out
+practical[1|2].pdf
+practical[1|2].tex
+solutions[1|2].tex
+solutions[1|2].pdf
+practical1-concordance.tex
+practical1.synctex.gz

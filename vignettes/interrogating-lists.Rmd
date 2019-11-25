@@ -1,0 +1,174 @@
+---
+title: "Interrogating the Output"
+author: "Jumping Rivers"
+output:
+  tufte::tufte_handout:
+    latex_engine: xelatex
+  tufte::tufte_html: default
+vignette: >
+  %\VignetteIndexEntry{interrogating-lists}
+  \usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, echo=FALSE}
+set.seed(1)
+z = rnorm(10)
+m = t.test(z)
+m_stats = signif(c(m$statistic, m$parameter, m$p.value, m$conf.int), 3)
+options(width = 58)
+``` 
+## Introduction
+
+Many of the standard statistical functions that we use in R return a collection
+of model diagnostics that does not fit naturally into a single data frame. For
+example, suppose we carry out a simple one-sided $t$-test
+
+```{r, }
+t.test(z)
+``` 
+
+\noindent The R output returns:
+
+- the test statistic: `m_stats[1]`
+- the degrees of freedom: `r m_stats[2]`
+- the $p$-value: `r m_stats[3]`
+- the confidence interval: (`r m_stats[4]`, `r m_stats[5]`). 
+
+When performing $\chi^2$ tests, amongst other things, the output contains
+expected and observed values. In this chapter, we will investigate how to
+programmatically access these objects.
+
+## An R list
+
+An R list is an object consisting of an ordered collection of (possibly
+different) objects known as its components. For example, a list could consist of
+a numeric vector and a data frame. To create a list, we use the `list` function
+
+```{r, }
+lst = list(course = "modelling", no_of_partipants = 3,
+    first_names = c("Rod", "Hull", "Emu"))
+``` 
+
+\noindent Components are always numbered. In the `lst` object above, we can access
+individual components using the double bracket notation. For example to select
+the third element from the list, we have
+
+```{r, }
+lst[[3]]
+``` 
+
+\noindent So to access the first element of the third component we
+do^[The third component is `first_names`.]
+
+```{r, }
+lst[[3]][1]
+``` 
+
+\noindent The `length()` function gives the number of top level components:
+
+```{r, }
+length(lst)
+``` 
+
+\noindent Components of lists may also be named. If this is the case, then we
+can also access the element using its name:
+
+```{r, }
+lst[["course"]]
+lst$course
+``` 
+
+\noindent A useful function for interrogating an object is
+`str()`.^[`str` is short for structure.] Using the `lst` object
+as an example, we have
+
+```{r, }
+str(lst)
+``` 
+
+
+## Example: $t$-test
+
+Lets go back to the $t$-test example in Section \@ref(sec:S3-1). Rather than print
+the function output to the screen, we will store the output in the variable
+`rst`:
+
+```{r, }
+rst = t.test(z)
+``` 
+
+\noindent The `rst` object has `r length(rst)` elements
+
+```{r, }
+length(rst)
+``` 
+
+\noindent with the following names
+
+```{r, }
+names(rst)
+``` 
+
+\noindent Using the `str()` function, we can interogate the `rst` object further
+
+```{r, }
+str(rst)
+``` 
+
+\noindent We can see that the $t$-function returns a list of nine elements. We can access
+these elements in the usual way
+
+```{r, }
+rst$statistic
+rst[[2]]
+``` 
+
+\noindent Being able to extract the output from functions will be very useful
+when we look at more advanced statistical routines.
+
+
+```{r, echo=FALSE}
+votes = data.frame(Labour = c(762, 484),
+  Cons = c(327, 239),
+  LibDem = c(468, 477))
+rownames(votes) = c("M", "F")
+Xsq = chisq.test(votes)
+``` 
+
+
+## Example: $
+
+Let's now return to the $\chi^2$ example from the notes. As
+before, we can extract the names of individuals list components, using the
+`names()` function\sidenote{I would also use the `str()` function, but to
+  save space in the notes, I've omitted the output.}
+
+```{r, }
+names(Xsq)
+``` 
+
+\noindent Each component of the list contains some information from the
+statistical analysis. For example, to get the $p$-value we use
+
+```{r, }
+Xsq$p.value
+``` 
+
+\noindent to retrieve the expected number of counts under the null hypothesis
+
+```{r, }
+Xsq$expected
+``` 
+
+\noindent If we were interested in which cells differed the most, we could look
+at the standardised residuals
+
+```{r, }
+Xsq$stdres
+``` 
+
+\noindent This table helps to explain why we rejected the null hypotheis of no association
+between gender and voting preference. It appears that more males voted Labour
+and fewer voted Liberal Democrat than would have been expected if the null hypothesis
+was true.
