@@ -16,7 +16,7 @@ The data can be obtained from:
 data(yeast, package = "jrModellingBio")
 ```
 
-1. Lets fit a liner regression model as follows: Use $mcg$ as the y or response variable and use $gvh$ as the x or explanatory variable. Should $gvh$ be included in the model to explain variatio in $mcg$?
+1. Lets fit a linear regression model as follows: Use `mcg` as the y or response variable and use `gvh` as the x or explanatory variable. Should `gvh` be included in the model to explain variatio in `mcg`?
     
 ```{r, }
 m = lm(mcg ~ gvh, data = yeast)
@@ -82,7 +82,7 @@ ggplot(m_aug, aes(sample = .std.resid)) +
 
 ## Question 2 - Multiple Linear Regression
 
-\newthought{Lets now} a more sensible model with some different data. We will look at the occurrence of infectious disease illnesses across three states in the USA caused by different microbial pathogens. Load the `outbreaks` dataset:
+\newthought{Lets now} fit a more sensible model with some different data. We will look at the occurrence of infectious disease illnesses across three states in the USA caused by different microbial pathogens. Load the `outbreaks` dataset:
 
 ```{r, echo=TRUE}
 data(outbreaks, package = "jrModellingBio")
@@ -102,7 +102,7 @@ ggplot(m_aug, aes(sample = .std.resid)) +
 # This looks way off, sensible first step here is to transform the y variable. Lets try a log transformation.
 ```
 
-2. Try fitting the model again but with log transformed illnessess. __Hint:__ use `log(illnesses)` in place of `illnesses`. Now re-exmamine the qq-plot? Have we fixed the problem?
+2. Try fitting the model again but with log transformed illnessess. _Hint: use `log(illnesses)` in place of `illnesses`._ Now re-exmamine the qq-plot? Have we fixed the problem?
 
 ```{r,fig.keep='none'}
 m = lm(log(illnesses) ~ year, data = outbreaks)
@@ -136,6 +136,11 @@ ggplot(outbreaks, aes(x = year, y = log(illnesses))) +
     geom_smooth(aes(colour = species), method = "lm")
 ```
 
+```{r,fig.margin = TRUE, fig.cap="Linear model of log(illnesses) against year and species with an interaction term", out.width='\\textwidth', echo=FALSE}
+ggplot(outbreaks, aes(x = year, y = log(illnesses))) +
+    geom_smooth(aes(colour = species), method = "lm")
+```
+
 ## Question 3 = ANOVA
 
 \newthought{Lets take a look} at whether infectious disease illnesses vary in abundance by state. 
@@ -150,7 +155,7 @@ tidy_m
 ## This suggests a difference may exist.
 ```
 
-2. Now we know that States differ in the abundance of infectious disease illnesses but which differences are significant. Recall that we can use Tukeys Honest Significant Differences (see ?TukeyHSD). Perform the Tukey HSD analysis on your anova model. What does this tell you?
+2. Now we know that States differ in the abundance of infectious disease illnesses but which differences are significant. Recall that we can use Tukeys Honest Significant Differences (see `?TukeyHSD`). Perform the Tukey HSD analysis on your anova model. What does this tell you?
 
 ```{r,  }
 TukeyHSD(m)
@@ -163,6 +168,11 @@ TukeyHSD(m)
 ggplot(outbreaks, aes(x = state, y = log(illnesses))) +
     geom_boxplot(aes(fill = state))
 
+ggplot(outbreaks, aes(x = log(illnesses))) +
+    geom_density(aes(fill = state), alpha = 0.5)
+```
+
+```{r,fig.margin = TRUE, fig.cap="Distribution of log(illnesses) across three states", out.width='\\textwidth', echo=FALSE}
 ggplot(outbreaks, aes(x = log(illnesses))) +
     geom_density(aes(fill = state), alpha = 0.5)
 ```
@@ -201,7 +211,7 @@ clusters = hclust(dist(yeast))
 plot(hclust(dist(yeast)), labels = seq_localisations)
 ```
 
-These next few sections are quite tricky, contain concepts that we didn't cover and are aimed at a very specific use case. If you don't see yourself making figure like Figure XXX then feel free to skip these and move on to question 6 on principal components analysis.
+These next few sections are quite tricky, contain concepts that we didn't cover and are aimed at a very specific use case. If you don't see yourself making figures like Figure 4 then feel free to skip these and move on to question 6 on principal components analysis.
 
 3. We can make the dendrogram significantly more pretty and informative with a recent addition to ggplot: [ggraph](https://github.com/thomasp85/ggraph). Install this package if you dont have it already. We will need the `ggraph` package as well as one of its dependencies `tidygraph`, both very powerful tools for working with graph data.
 
@@ -233,9 +243,9 @@ cluster_tbl = cluster_tbl %>%
     left_join(seq_labels)
 ```
 
-6. Finally make the graph figure in 
+6. Finally make the graph in figure 4. You can use standard ggplot2 syntax and the `geom_edge_elbow()` and `geom_node_point()` as layers. Just remember that we need to creat the gglot object with `ggrapp()` instead of ggplot()`
 
-```{r}
+```{r, fig.keep='none'}
 ggraph(cluster_tbl, 'tree') + 
     geom_edge_elbow(width = 0.2) +
     geom_node_point(aes(filter = leaf, colour = localisations), size = 2)
@@ -249,9 +259,9 @@ ggraph(cluster_tbl, 'tree') +
 
 ## Question 6 - Principal components analysis (PCA)
 
-PCA will; 
+PCA has several advantages; 
 
-- (a) reduce the complexity of the amino acid sequence properties 
+- (a) reduce the complexity of the data on aa sequence properties
 - (b) allow us to understand the relationships among aa sequence properties
 - (c) help identify loci similar across all aa sequence properties
 

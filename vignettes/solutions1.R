@@ -1,6 +1,6 @@
 ## ----include = FALSE-----------------------
 library(tufte)
-knitr::opts_chunk$set(results = "hide", echo = FALSE)
+# knitr::opts_chunk$set(results = "hide", echo = FALSE)
 
 ## ---- echo = TRUE, message= FALSE, warning = FALSE----
 library("jrModellingBio")

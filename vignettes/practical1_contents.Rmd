@@ -10,7 +10,7 @@ library("tidyverse")
 
 ## Question 1
 
-The following code will load a data set into your current session which contains a data frame of of measurements of sequence recognition from yeast proteins with different subcellular localisations[^1].
+The following code will load a data set into your current session. We will examine measurements of sequence recognition from yeast proteins with different subcellular localisations[^1].
 
 [^1]: Paul Horton & Kenta Nakai, ["A Probablistic Classification System for Predicting the Cellular Localization Sites of Proteins"](https://www.aaai.org/Papers/ISMB/1996/ISMB96-012.pdf), Intelligent Systems in Molecular Biology, 109-115. St. Louis, USA 1996. 
 
@@ -25,7 +25,10 @@ Use the `head()` or `View()` or other functions of your choice to examine the co
 a) Sometimes, it's useful to get data into a tidy format before we start analysis. We can then use the `pivot_longer()` function from **tidyr** to get the data into the correct shape for analysis. The `pivot_longer()` function gathers up the two subcellular localisations columns into one new variable. If you haven't used the `pivot_longer()` function before, have a look at the help file `?pivot_longer()`. 
 
     ```{r, echo = TRUE}
-two_classes_long = pivot_longer(two_classes, cols = c(CYT, EXC), names_to = "class", values_to = "mcg")
+two_classes_long = pivot_longer(two_classes, 
+                                cols = c(CYT, EXC), 
+                                names_to = "class", 
+                                values_to = "mcg")
     ```
 
 b) Exploratory data analysis. - Construct boxplots, density plots and q-q plots for this data set. Work out the means and standard deviations. Before carrying out any statistical test, what do you think your conclusions will be? Do you think the variances are roughly equal? Do you think the data conforms to a normal distribution?
@@ -68,7 +71,7 @@ t.test(mcg ~ class, data = two_classes_long, var.equal = TRUE)
 
 e) $^*$ Now carry out a `wilcox.test()`.
 
-```{r, }
+```{r, message=FALSE}
 wilcox.test(mcg ~ class, data = two_classes_long)
 ```
 
@@ -82,7 +85,7 @@ Load the data into R using the following code:
 data(yeast_classes, package = "jrModellingBio")
 ```
 
-a) Carry out a $\chi^2$ goodness of fit test on the zodiac data. Are yeast proteins distributed uniformly across subcellular localisations?
+a) Carry out a $\chi^2$ goodness of fit test on the yeast classes data. Are yeast proteins distributed uniformly across subcellular localisations?
 
 ```{r,  }
 m = chisq.test(yeast_classes)
@@ -107,13 +110,13 @@ m_aug$.stdres
 
 ## Question 3
 
-\newthought{We} might reasonably expect McGeoch’s signal sequence detection parameter `mcg` and the a method for detecting cleavable signal sequences `gvh` to be correlated so lets test whether or not these two measurements are associated with one another. We will do this by calculating pearsons correlation coefficient but first lets load the full yeast data set:
+\newthought{We} might reasonably expect McGeoch’s signal sequence detection parameter `mcg` and a method for detecting cleavable signal sequences `gvh` to be correlated so lets test whether or not these two measurements are associated with one another. We will do this by calculating pearsons correlation coefficient but first lets load the full yeast data set:
 
 ```{r, echo = TRUE}
 data(yeast, package = "jrModellingBio")
 ```
 
-a) Perform the $\r^2$ correlation test to determine if the two measurements of signal sequences `mcg` and `gvh` are correlated.
+a) Perform pearsons correlation test correlation test to determine if the two measurements of signal sequences `mcg` and `gvh` are correlated.
 
 ```{r, warning=FALSE, }
 test = cor.test(~ mcg + gvh, data = yeast)
@@ -126,7 +129,7 @@ b) Now use the `glance()` function to extract summary statistics from the test t
 r2 = signif(glance(test)$estimate, 3)
 ```
 
-c) Now plot the data as a scatter plot using `ggplot2` and annotate the plot with the `annotate()` function adding the correlation coefficient onto the figure. __Hint: you can create a nice label with the `paste()` function to stick bits of text together including variables you have created.__
+c) Now plot the data as a scatter plot using `ggplot2` and annotate the plot with the `annotate()` function adding the correlation coefficient onto the figure. _Hint: you can create a nice label with the `paste()` function to stick bits of text together including variables you have created._
 
 ```{r,  }
 ggplot(yeast, aes(x = mcg, y = gvh)) +
