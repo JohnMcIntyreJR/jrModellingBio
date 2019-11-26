@@ -1,6 +1,5 @@
 linters: with_defaults(
     assignment_linter = NULL, 
-    line_length_linter(120)
-  )
+    line_length_linter(120),trailing_whitespace_linter = NULL)
 exclusions: list("inst/shinyExamples/regression/server.R", 
                   "inst/shinyExamples/regression/ui.R")

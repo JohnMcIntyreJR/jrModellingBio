@@ -4,3 +4,4 @@ Makefile
 .travis.yml
 ^.lintr$
 data-raw/
+^Dockerfile$

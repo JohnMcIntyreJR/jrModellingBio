@@ -1,38 +1,43 @@
-Package: jrModellingBio
 Type: Package
+Package: jrModellingBio
 Title: Statistical Modelling with R for Biologists
-Version: 0.0.01
-Authors@R: person("Jumping", "Rivers", 
-  email="info@jumpingrivers.com", 
-  role = c("aut", "cre"))
-Description: Practicals and data sets for an Introduction to Statistical modelling.
-URL: http://jumpingrivers.com
+Version: 0.0.1
+Authors@R: 
+    person(given = "Jumping",
+           family = "Rivers",
+           role = c("aut", "cre"),
+           email = "info@jumpingrivers.com")
+Description: Practicals and data sets for an Introduction to
+    Statistical modelling.
 License: GPL-3 | GPL-2
+URL: https://www.jumpingrivers.com
 Depends:
-    R (>= 3.2.0)
+    R (>= 3.5.0)
 Imports:
+    broom,
     coin,
-    shiny,
-    ggplot2, 
-    titanic,
+    dplyr,
+    ggplot2,
+    ggraph,
+    jrModelling,
     mvtnorm,
     rmarkdown,
-    tufte, 
-    gridExtra,
-    broom,
+    shiny,
+    tidygraph,
     tidyverse,
-    ggraph
-Remotes: 
-    jr-packages/jrData
+    titanic
 Suggests:
-    survival,
-    knitr,
-    jrData,
-    testthat,
-    lintr,
     cowsay,
-    DT, 
-    dplyr
-VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+    DT,
+    gridExtra,
+    knitr,
+    lintr,
+    survival,
+    testthat,
+    tufte
+VignetteBuilder: 
+    knitr
+Remotes: 
+    jr-packages/jrModelling
 Encoding: UTF-8
+RoxygenNote: 6.1.1

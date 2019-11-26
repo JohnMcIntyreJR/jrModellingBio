@@ -206,11 +206,11 @@ These next few sections are quite tricky, contain concepts that we didn't cover 
 3. We can make the dendrogram significantly more pretty and informative with a recent addition to ggplot: [ggraph](https://github.com/thomasp85/ggraph). Install this package if you dont have it already. We will need the `ggraph` package as well as one of its dependencies `tidygraph`, both very powerful tools for working with graph data.
 
 ```{r, echo=TRUE}
-library(tidygraph)
-library(ggraph)
+library("tidygraph")
+library("ggraph")
 ```
 
-4. Now convert your `hclust` object into a `tbl_graph` object using the `as_tbl_graph()` function from `tidygraph`.
+4. Now convert your `hclust` object into a `tbl_graph` object using the `as_tbl_graph()` function from __tidygraph__.
 
 ```{r}
 cluster_tbl = as_tbl_graph(clusters)

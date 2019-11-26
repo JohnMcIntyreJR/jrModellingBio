@@ -47,7 +47,10 @@
 #'                ERL (endoplasmic reticulum lumen)                    5}
 #'   ...
 #' }
-#' @source Paul Horton & Kenta Nakai, ["A Probablistic Classification System for Predicting the Cellular Localization Sites of Proteins"](https://www.aaai.org/Papers/ISMB/1996/ISMB96-012.pdf), Intelligent Systems in Molecular Biology, 109-115. St. Louis, USA 1996.
+#' @source Paul Horton & Kenta Nakai, A Probablistic Classification System for Predicting 
+#' the Cellular Localization 
+#' ["Sites of Proteins"](https://www.aaai.org/Papers/ISMB/1996/ISMB96-012.pdf), 
+#' Intelligent Systems in Molecular Biology, 109-115. St. Louis, USA 1996.
 "yeast"
 
 #' Classes for the yeast data
@@ -63,7 +66,7 @@
 #' @title Infectious disease outbreaks in the USA, data from the CDC
 #'
 #' @description This dataset provides data on foodborne disease outbreaks reported to CDC from 1998 
-#' through 2015. Data fields include year, state (outbreaks occurring in more than one state are listed 
+#' through 2015. Data fields include year, state (outbreaks occurring in more than one state are listed
 #' as "multistate"), location where the food was prepared, reported food vehicle and contaminated 
 #' ingredient, etiology (the pathogen, toxin, or chemical that caused the illnesses), status (whether 
 #' the etiology was confirmed or suspected), total illnesses, hospitalizations, and fatalities. 
