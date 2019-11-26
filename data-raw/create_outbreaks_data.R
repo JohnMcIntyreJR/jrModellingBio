@@ -4,15 +4,22 @@ library(tidyr)
 
 outbreaks = read_csv("data-raw/outbreaks.csv")
 
-top3 = outbreaks %>% 
+top3_species = outbreaks %>% 
   drop_na(Species) %>% 
   group_by(Species) %>% 
   count(sort = TRUE) %>% 
   ungroup() %>% 
   top_n(3)
 
+top3_states = outbreaks %>% 
+  drop_na(State) %>% 
+  group_by(State) %>% 
+  count(sort = TRUE) %>% 
+  ungroup() %>% 
+  top_n(3)
+
 outbreaks = outbreaks %>% 
-  filter(Species %in% top3$Species)
+  filter(Species %in% top3_species$Species & State %in% top3_states$State)
 
 colnames(outbreaks) = tolower(colnames(outbreaks))
 
