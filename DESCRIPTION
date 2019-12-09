@@ -17,6 +17,7 @@ Imports:
     broom,
     coin,
     dplyr,
+    formatR,
     ggplot2,
     ggraph,
     jrModelling,
@@ -25,8 +26,7 @@ Imports:
     shiny,
     tidygraph,
     tidyverse,
-    titanic,
-    formatR
+    titanic
 Suggests:
     cowsay,
     DT,
