@@ -73,16 +73,10 @@ ggplot(m_aug, aes(sample = .std.resid)) +
 
 5. What is wrong with this model? Discuss (in less than 20 words).
 
-```{r, }
+```{r}
 # When we fit a regression model we are implicitly assuming a causal relationship.
-```
-```{r}
 # In this case we are talking about two measurements of signal peptides, one is
-```
-```{r}
 # unlikely to be caused by the other but they are correlated because some (as yet) 
-```
-```{r}
 # unseen variable is causally related to both.
 ```
 ## Question 2 - Multiple Linear Regression
