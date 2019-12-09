@@ -246,13 +246,13 @@ cluster_tbl = cluster_tbl %>%
 6. Finally make the graph in figure 4. You can use standard ggplot2 syntax and the `geom_edge_elbow()` and `geom_node_point()` as layers. Just remember that we need to creat the gglot object with `ggrapp()` instead of ggplot()`
 
 ```{r, fig.keep='none'}
-ggraph(cluster_tbl, 'tree') + 
+ggraph(cluster_tbl, "tree") + 
     geom_edge_elbow(width = 0.2) +
     geom_node_point(aes(filter = leaf, colour = localisations), size = 2)
 ```
 
 ```{r,fig.margin = TRUE, fig.cap="Dendrogram of yeast proteins clustered by similarity in amino acid sequence properties", out.width='\\textwidth', echo=FALSE}
-ggraph(cluster_tbl, 'tree') + 
+ggraph(cluster_tbl, "tree") + 
     geom_edge_elbow(width = 0.2) +
     geom_node_point(aes(filter = leaf, colour = localisations), size = 2)
 ```
