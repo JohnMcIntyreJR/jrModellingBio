@@ -75,7 +75,8 @@ ggplot(m_aug, aes(sample = .std.resid)) +
 
 ```{r, }
 # When we fit a regression model we are implicitly assuming a causal relationship.
-# In this case we are talking about two measurements of signal peptides, one is unlikely to be caused by the other but they are correlated because some (as yet) unseen variable is causally related to both.
+# In this case we are talking about two measurements of signal peptides, one is
+# unlikely to be caused by the other but they are correlated because some (as yet)   # unseen variable is causally related to both.
 ```
 
 

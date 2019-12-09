@@ -133,7 +133,7 @@ votes = data.frame(Labour = c(762, 484),
   Cons = c(327, 239),
   LibDem = c(468, 477))
 rownames(votes) = c("M", "F")
-Xsq = chisq.test(votes)
+xsq = chisq.test(votes)
 ``` 
 
 
