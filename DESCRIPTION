@@ -25,7 +25,8 @@ Imports:
     shiny,
     tidygraph,
     tidyverse,
-    titanic
+    titanic,
+    formatR
 Suggests:
     cowsay,
     DT,
