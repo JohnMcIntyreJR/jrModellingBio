@@ -11,6 +11,10 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
+```{r setup, include = FALSE}
+library(formatR)
+```
+
 ```{r, echo=FALSE}
 set.seed(1)
 z = rnorm(10)
