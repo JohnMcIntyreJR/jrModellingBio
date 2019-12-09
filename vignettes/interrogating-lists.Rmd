@@ -149,27 +149,27 @@ before, we can extract the names of individuals list components, using the
   save space in the notes, I've omitted the output.}
 
 ```{r, }
-names(Xsq)
+names(xsq)
 ``` 
 
 \noindent Each component of the list contains some information from the
 statistical analysis. For example, to get the $p$-value we use
 
 ```{r, }
-Xsq$p.value
+xsq$p.value
 ``` 
 
 \noindent to retrieve the expected number of counts under the null hypothesis
 
 ```{r, }
-Xsq$expected
+xsq$expected
 ``` 
 
 \noindent If we were interested in which cells differed the most, we could look
 at the standardised residuals
 
 ```{r, }
-Xsq$stdres
+xsq$stdres
 ``` 
 
 \noindent This table helps to explain why we rejected the null hypotheis of no association
